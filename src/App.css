@@ -1,3 +1,21 @@
-html, body {
-  overscroll-behavior: none; /* no rubber band at all */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overscroll-behavior: none;
+  background-color: #f1f5f9;
+  color: #0f172a;
+  font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+main.app {
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.app__shell {
+  display: flex;
+  gap: 20px;
+  height: calc(100vh - 40px);
 }

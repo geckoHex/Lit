@@ -1,0 +1,258 @@
+.note-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-sizing: border-box;
+  min-height: 0;
+}
+
+.note-view--empty {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #64748b;
+}
+
+.note-view__header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.note-view__save-button {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid #0f172a;
+  background-color: #0f172a;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.note-view__save-button:hover {
+  background-color: #1e293b;
+  border-color: #1e293b;
+}
+
+.note-view__title {
+  width: 100%;
+  border: 1px solid #cbd5f5;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.note-view__title:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.note-editor {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.note-editor__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: #f8fafc;
+}
+
+.note-editor__toolbar-group {
+  display: flex;
+  gap: 6px;
+}
+
+.note-editor__toolbar-group + .note-editor__toolbar-group {
+  padding-left: 6px;
+  border-left: 1px solid #d4d4d8;
+}
+
+.note-editor__toolbar button {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
+  background-color: #ffffff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.note-editor__toolbar button:hover {
+  background-color: #eef2ff;
+  border-color: #6366f1;
+  color: #1e293b;
+}
+
+.note-editor__panels {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+.note-editor__input,
+.note-editor__preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.note-editor__textarea {
+  flex: 1;
+  width: 100%;
+  border: 1px solid #cbd5f5;
+  border-radius: 10px;
+  padding: 16px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro", "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  background-color: #f8fafc;
+  box-sizing: border-box;
+  resize: none;
+}
+
+.note-editor__textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.note-editor__preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.note-editor__preview-title {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.note-editor__preview-mode {
+  display: flex;
+  gap: 4px;
+}
+
+.note-editor__preview-mode button {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 6px 10px;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.note-editor__preview-mode button.active {
+  border-color: #6366f1;
+  background-color: #eef2ff;
+  color: #1e293b;
+}
+
+.note-editor__preview-mode button:not(.active):hover {
+  background-color: #e2e8f0;
+}
+
+.note-editor__preview-body {
+  flex: 1;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  background-color: #ffffff;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.note-editor__preview-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: #0f172a;
+  line-height: 1.7;
+}
+
+.note-editor__preview-content h1,
+.note-editor__preview-content h2,
+.note-editor__preview-content h3,
+.note-editor__preview-content h4,
+.note-editor__preview-content h5,
+.note-editor__preview-content h6 {
+  margin: 0;
+  line-height: 1.3;
+}
+
+.note-editor__preview-content p {
+  margin: 0;
+}
+
+.note-editor__preview-content ul,
+.note-editor__preview-content ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.note-editor__preview-content blockquote {
+  border-left: 3px solid #cbd5f5;
+  margin: 0;
+  padding-left: 12px;
+  color: #475569;
+}
+
+.note-editor__preview-content pre {
+  margin: 0;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #0f172a;
+  color: #f8fafc;
+  overflow-x: auto;
+}
+
+.note-editor__preview-content code {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background-color: #e2e8f0;
+}
+
+.note-editor__raw-preview {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro", "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #0f172a;
+}
+
+.note-editor__empty-preview {
+  margin: 0;
+  color: #94a3b8;
+}
+
+@media (max-width: 1024px) {
+  .note-editor__panels {
+    flex-direction: column;
+  }
+}

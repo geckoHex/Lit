@@ -318,8 +318,8 @@ function App() {
   };
 
   return (
-    <main>
-      <div style={{ display: 'flex', gap: '20px' }}>
+    <main className="app">
+      <div className="app__shell">
         <Sidebar 
           notes={notes}
           folders={folders}
