@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
-import type { Note, Folder } from "../types";
+import type { Note, Folder, NoteViewMode } from "../types";
 
 interface SidebarProps {
   notes: Note[];
@@ -14,6 +14,8 @@ interface SidebarProps {
   onDeleteNote: (noteId: string) => void;
   onRenameFolder: (folderId: string, newName: string) => void;
   onDeleteFolder: (folderId: string) => void;
+  viewMode: NoteViewMode;
+  onViewModeChange: (mode: NoteViewMode) => void;
 }
 
 function Sidebar({ 
@@ -27,7 +29,9 @@ function Sidebar({
   onRenameNote,
   onDeleteNote,
   onRenameFolder,
-  onDeleteFolder
+  onDeleteFolder,
+  viewMode,
+  onViewModeChange
 }: SidebarProps) {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [contextMenu, setContextMenu] = useState<{
@@ -260,6 +264,53 @@ function Sidebar({
   return (
     <div style={{ width: '300px', borderRight: '1px solid #ccc', padding: '10px' }}>
       <h2>Notes</h2>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "12px",
+          gap: "8px",
+        }}
+      >
+        <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "#334155" }}>Mode</span>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <button
+            type="button"
+            onClick={() => onViewModeChange("edit")}
+            aria-pressed={viewMode === "edit"}
+            style={{
+              padding: "6px 12px",
+              borderRadius: "6px",
+              border: viewMode === "edit" ? "1px solid #6366f1" : "1px solid #cbd5f5",
+              backgroundColor: viewMode === "edit" ? "#eef2ff" : "#ffffff",
+              color: "#1e293b",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            onClick={() => onViewModeChange("view")}
+            aria-pressed={viewMode === "view"}
+            style={{
+              padding: "6px 12px",
+              borderRadius: "6px",
+              border: viewMode === "view" ? "1px solid #6366f1" : "1px solid #cbd5f5",
+              backgroundColor: viewMode === "view" ? "#eef2ff" : "#ffffff",
+              color: "#1e293b",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            View
+          </button>
+        </div>
+      </div>
       <div style={{ marginBottom: '10px', display: 'flex', gap: '5px' }}>
         <button onClick={onNewNote} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <img src="/icons/sidebar/file-plus.svg" alt="New note icon" width={16} height={16} />

@@ -1,7 +1,7 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
-import type { Note } from "../types";
+import type { Note, NoteViewMode } from "../types";
 import "./NoteView.css";
 
 marked.setOptions({
@@ -20,8 +20,6 @@ type TransformationResult = {
   selectionEnd: number;
 };
 
-type ViewMode = "rendered" | "raw";
-
 interface NoteViewProps {
   note: Note | null;
   title: string;
@@ -29,6 +27,7 @@ interface NoteViewProps {
   onTitleChange: (title: string) => void;
   onContentChange: (content: string) => void;
   onSave: () => void;
+  viewMode: NoteViewMode;
 }
 
 function NoteView({
@@ -38,9 +37,10 @@ function NoteView({
   onTitleChange,
   onContentChange,
   onSave,
+  viewMode,
 }: NoteViewProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>("raw");
+  const isEditMode = viewMode === "edit";
 
   const previewHtml = useMemo(() => {
     if (!content.trim()) {
@@ -55,6 +55,10 @@ function NoteView({
   const applyTransformation = (
     transformer: (value: string, selection: SelectionRange) => TransformationResult
   ) => {
+    if (!isEditMode) {
+      return;
+    }
+
     const textarea = textareaRef.current;
     if (!textarea) return;
 
@@ -261,108 +265,85 @@ function NoteView({
       <div className="note-editor">
         <div className="note-editor__toolbar">
           <div className="note-editor__toolbar-group">
-            <button type="button" onClick={() => insertHeading(1)} aria-label="Heading 1">
+            <button type="button" onClick={() => insertHeading(1)} aria-label="Heading 1" disabled={!isEditMode}>
               H1
             </button>
-            <button type="button" onClick={() => insertHeading(2)} aria-label="Heading 2">
+            <button type="button" onClick={() => insertHeading(2)} aria-label="Heading 2" disabled={!isEditMode}>
               H2
             </button>
-            <button type="button" onClick={() => insertHeading(3)} aria-label="Heading 3">
+            <button type="button" onClick={() => insertHeading(3)} aria-label="Heading 3" disabled={!isEditMode}>
               H3
             </button>
           </div>
 
           <div className="note-editor__toolbar-group">
-            <button type="button" onClick={() => wrapSelection("**", "**", { placeholder: "Bold text" })} aria-label="Bold">
+            <button type="button" onClick={() => wrapSelection("**", "**", { placeholder: "Bold text" })} aria-label="Bold" disabled={!isEditMode}>
               <strong>B</strong>
             </button>
-            <button type="button" onClick={() => wrapSelection("*", "*", { placeholder: "Italic text" })} aria-label="Italic">
+            <button type="button" onClick={() => wrapSelection("*", "*", { placeholder: "Italic text" })} aria-label="Italic" disabled={!isEditMode}>
               <em>I</em>
             </button>
-            <button type="button" onClick={() => wrapSelection("~~", "~~", { placeholder: "Strikethrough" })} aria-label="Strikethrough">
+            <button type="button" onClick={() => wrapSelection("~~", "~~", { placeholder: "Strikethrough" })} aria-label="Strikethrough" disabled={!isEditMode}>
               S
             </button>
-            <button type="button" onClick={() => wrapSelection("`", "`", { placeholder: "code" })} aria-label="Inline code">
+            <button type="button" onClick={() => wrapSelection("`", "`", { placeholder: "code" })} aria-label="Inline code" disabled={!isEditMode}>
               `code`
             </button>
           </div>
 
           <div className="note-editor__toolbar-group">
-            <button type="button" onClick={() => wrapSelection("```\n", "\n```", { placeholder: "Code block" })} aria-label="Code block">
+            <button type="button" onClick={() => wrapSelection("```\n", "\n```", { placeholder: "Code block" })} aria-label="Code block" disabled={!isEditMode}>
               {"</>"}
             </button>
-            <button type="button" onClick={() => prefixLines("> ", { placeholder: "Quote", transformLine: (line) => line.replace(/^>\s?/u, "") })} aria-label="Blockquote">
+            <button type="button" onClick={() => prefixLines("> ", { placeholder: "Quote", transformLine: (line) => line.replace(/^>\s?/u, "") })} aria-label="Blockquote" disabled={!isEditMode}>
               &gt;
             </button>
-            <button type="button" onClick={() => prefixLines("- ", { placeholder: "List item", transformLine: (line) => line.replace(/^(-|\*)\s*/u, "") })} aria-label="Bullet list">
+            <button type="button" onClick={() => prefixLines("- ", { placeholder: "List item", transformLine: (line) => line.replace(/^(-|\*)\s*/u, "") })} aria-label="Bullet list" disabled={!isEditMode}>
               *
             </button>
-            <button type="button" onClick={insertOrderedList} aria-label="Numbered list">
+            <button type="button" onClick={insertOrderedList} aria-label="Numbered list" disabled={!isEditMode}>
               1.
             </button>
-            <button type="button" onClick={insertChecklist} aria-label="Checklist">
+            <button type="button" onClick={insertChecklist} aria-label="Checklist" disabled={!isEditMode}>
               [ ]
             </button>
-            <button type="button" onClick={insertHorizontalRule} aria-label="Horizontal rule">
+            <button type="button" onClick={insertHorizontalRule} aria-label="Horizontal rule" disabled={!isEditMode}>
               ---
             </button>
           </div>
 
           <div className="note-editor__toolbar-group">
-            <button type="button" onClick={insertLink} aria-label="Link">
+            <button type="button" onClick={insertLink} aria-label="Link" disabled={!isEditMode}>
               Link
             </button>
-            <button type="button" onClick={insertImage} aria-label="Image">
+            <button type="button" onClick={insertImage} aria-label="Image" disabled={!isEditMode}>
               Img
             </button>
           </div>
+        </div>
 
-          <div className="note-editor__toolbar-group note-editor__view-toggle">
-            <button
-              type="button"
-              className={viewMode === "raw" ? "active" : ""}
-              onClick={() => setViewMode("raw")}
-              aria-label="Show raw markdown editor"
-            >
-              Raw
-            </button>
-            <button
-              type="button"
-              className={viewMode === "rendered" ? "active" : ""}
-              onClick={() => setViewMode("rendered")}
-              aria-label="Show rendered markdown preview"
-            >
-              Rendered
-            </button>
+        {isEditMode ? (
+          <div className="note-editor__input">
+            <textarea
+              ref={textareaRef}
+              className="note-editor__textarea"
+              placeholder="Start typing..."
+              value={content}
+              onChange={(event) => onContentChange(event.target.value)}
+            />
           </div>
-        </div>
-
-        <div className="note-editor__panels">
-          {viewMode === "raw" ? (
-            <div className="note-editor__input">
-              <textarea
-                ref={textareaRef}
-                className="note-editor__textarea"
-                placeholder="Start typing in Markdown..."
-                value={content}
-                onChange={(event) => onContentChange(event.target.value)}
+        ) : (
+          <div className="note-editor__preview">
+            {previewHtml ? (
+              <div
+                className="note-editor__preview-content"
+                dangerouslySetInnerHTML={{ __html: previewHtml }}
               />
-            </div>
-          ) : (
-            <div className="note-editor__preview">
-              <div className="note-editor__preview-body">
-                {previewHtml ? (
-                  <div
-                    className="note-editor__preview-content"
-                    dangerouslySetInnerHTML={{ __html: previewHtml }}
-                  />
-                ) : (
-                  <p className="note-editor__empty-preview">Nothing to preview yet.</p>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+            ) : (
+              <p className="note-editor__empty-preview">Nothing to display. Switch to edit mode to add content.</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

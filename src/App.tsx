@@ -11,7 +11,7 @@ import {
 } from "@tauri-apps/plugin-fs";
 import Sidebar from "./components/Sidebar";
 import NoteView from "./components/NoteView";
-import type { Note, Folder } from "./types";
+import type { Note, Folder, NoteViewMode } from "./types";
 
 
 function App() {
@@ -21,6 +21,7 @@ function App() {
   const [noteContent, setNoteContent] = useState("");
   const [noteTitle, setNoteTitle] = useState("");
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+  const [noteViewMode, setNoteViewMode] = useState<NoteViewMode>("edit");
 
   // Initialize notes directory and load notes
   useEffect(() => {
@@ -332,6 +333,8 @@ function App() {
           onDeleteNote={deleteNote}
           onRenameFolder={renameFolder}
           onDeleteFolder={deleteFolder}
+          viewMode={noteViewMode}
+          onViewModeChange={setNoteViewMode}
         />
         
         <NoteView
@@ -341,6 +344,7 @@ function App() {
           onTitleChange={setNoteTitle}
           onContentChange={setNoteContent}
           onSave={saveNote}
+          viewMode={noteViewMode}
         />
       </div>
     </main>

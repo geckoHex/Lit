@@ -85,31 +85,6 @@
   border-left: 1px solid #d4d4d8;
 }
 
-.note-editor__view-toggle {
-  margin-left: auto;
-}
-
-.note-editor__view-toggle button {
-  border: 1px solid transparent;
-  border-radius: 6px;
-  padding: 6px 10px;
-  background-color: transparent;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-
-.note-editor__view-toggle button.active {
-  border-color: #6366f1;
-  background-color: #eef2ff;
-  color: #1e293b;
-}
-
-.note-editor__view-toggle button:not(.active):hover {
-  background-color: #e2e8f0;
-}
-
 .note-editor__toolbar button {
   padding: 8px 10px;
   border-radius: 6px;
@@ -128,15 +103,15 @@
   color: #1e293b;
 }
 
-.note-editor__panels {
-  display: flex;
-  gap: 16px;
-  flex: 1;
-  min-height: 0;
+.note-editor__toolbar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #e2e8f0;
+  background-color: #f8fafc;
+  color: #64748b;
 }
 
-.note-editor__input,
-.note-editor__preview {
+.note-editor__input {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -149,12 +124,13 @@
   border: 1px solid #cbd5f5;
   border-radius: 10px;
   padding: 16px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro", "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+  font-family: inherit;
   font-size: 0.95rem;
   line-height: 1.6;
-  background-color: #f8fafc;
+  background-color: #ffffff;
   box-sizing: border-box;
-  resize: none;
+  resize: vertical;
+  min-height: 240px;
 }
 
 .note-editor__textarea:focus {
@@ -163,7 +139,7 @@
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
-.note-editor__preview-body {
+.note-editor__preview {
   flex: 1;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
@@ -171,14 +147,11 @@
   background-color: #ffffff;
   overflow-y: auto;
   box-sizing: border-box;
-}
-
-.note-editor__preview-content {
+  color: #0f172a;
+  line-height: 1.7;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  color: #0f172a;
-  line-height: 1.7;
 }
 
 .note-editor__preview-content h1,
@@ -187,29 +160,30 @@
 .note-editor__preview-content h4,
 .note-editor__preview-content h5,
 .note-editor__preview-content h6 {
-  margin: 0;
+  margin-top: 0;
+  margin-bottom: 12px;
   line-height: 1.3;
 }
 
-.note-editor__preview-content p {
-  margin: 0;
+.note-editor__preview-content p,
+.note-editor__preview-content ul,
+.note-editor__preview-content ol,
+.note-editor__preview-content blockquote {
+  margin: 0 0 12px 0;
 }
 
 .note-editor__preview-content ul,
 .note-editor__preview-content ol {
-  margin: 0;
   padding-left: 1.5rem;
 }
 
 .note-editor__preview-content blockquote {
   border-left: 3px solid #cbd5f5;
-  margin: 0;
   padding-left: 12px;
   color: #475569;
 }
 
 .note-editor__preview-content pre {
-  margin: 0;
   padding: 12px;
   border-radius: 8px;
   background-color: #0f172a;
@@ -226,10 +200,4 @@
 .note-editor__empty-preview {
   margin: 0;
   color: #94a3b8;
-}
-
-@media (max-width: 1024px) {
-  .note-editor__panels {
-    flex-direction: column;
-  }
 }

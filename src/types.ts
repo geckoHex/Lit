@@ -16,3 +16,5 @@ export interface Folder {
 export type TreeItem = 
   | { type: 'note'; data: Note }
   | { type: 'folder'; data: Folder };
+
+export type NoteViewMode = "edit" | "view";
