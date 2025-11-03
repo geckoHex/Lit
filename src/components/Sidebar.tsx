@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
 import type { Note, Folder, NoteViewMode } from "../types";
+import "./Sidebar.css";
 
 interface SidebarProps {
   notes: Note[];
   folders: Folder[];
   currentFolderId: string | null;
+  currentNote: Note | null;
   onNoteSelect: (note: Note) => void;
   onNewNote: () => void;
   onNewFolder: (parentId: string | null) => void;
@@ -22,6 +24,7 @@ function Sidebar({
   notes, 
   folders,
   currentFolderId,
+  currentNote,
   onNoteSelect, 
   onNewNote,
   onNewFolder,
@@ -187,42 +190,52 @@ function Sidebar({
           return (
             <div
               key={folder.id}
-              style={{ marginLeft: `${depth * 20}px` }}
-              onContextMenu={(event) => handleContextMenu(event, "folder", folder.id, folder.name)}
+              className="tree-item"
+              style={{ marginLeft: `${depth * 16}px` }}
             >
-              {editingItem?.type === "folder" && editingItem.id === folder.id ? (
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <img src={folderIcon} alt="" width={16} height={16} aria-hidden="true" />
-                  <input
-                    ref={editInputRef}
-                    value={editValue}
-                    onChange={(event) => setEditValue(event.target.value)}
-                    onKeyDown={handleEditKeyDown}
-                    onBlur={handleEditSubmit}
-                    style={{ flex: 1 }}
-                    aria-label="Rename folder"
-                  />
-                </div>
-              ) : (
-                <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                  <button
-                    onClick={() => toggleFolder(folder.id)}
-                    style={{ display: "flex", alignItems: "center", gap: "6px" }}
-                    aria-label={`${isExpanded ? "Collapse" : "Expand"} ${folder.name}`}
-                  >
-                    <img src={folderIcon} alt="" width={16} height={16} aria-hidden="true" />
-                    <span>{folder.name}</span>
-                  </button>
-                  <button
-                    onClick={() => onNewFolder(folder.id)}
-                    title="New subfolder"
-                    aria-label="Create subfolder"
-                  >
-                    <img src="/icons/sidebar/folder-simple-plus.svg" alt="" width={16} height={16} aria-hidden="true" />
-                  </button>
+              <div
+                className="tree-item__content"
+                onContextMenu={(event) => handleContextMenu(event, "folder", folder.id, folder.name)}
+              >
+                {editingItem?.type === "folder" && editingItem.id === folder.id ? (
+                  <>
+                    <img src={folderIcon} alt="" className="tree-item__icon" aria-hidden="true" />
+                    <input
+                      ref={editInputRef}
+                      value={editValue}
+                      onChange={(event) => setEditValue(event.target.value)}
+                      onKeyDown={handleEditKeyDown}
+                      onBlur={handleEditSubmit}
+                      className="tree-item__input"
+                      aria-label="Rename folder"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => toggleFolder(folder.id)}
+                      className="tree-item__button"
+                      aria-label={`${isExpanded ? "Collapse" : "Expand"} ${folder.name}`}
+                    >
+                      <img src={folderIcon} alt="" className="tree-item__icon" aria-hidden="true" />
+                      <span className="tree-item__text">{folder.name}</span>
+                    </button>
+                    <button
+                      onClick={() => onNewFolder(folder.id)}
+                      className="tree-item__subfolder-button"
+                      title="New subfolder"
+                      aria-label="Create subfolder"
+                    >
+                      <img src="/icons/sidebar/folder-simple-plus.svg" alt="" aria-hidden="true" />
+                    </button>
+                  </>
+                )}
+              </div>
+              {isExpanded && (
+                <div className="tree-item__children">
+                  {renderTreeItem(folder.id, 0)}
                 </div>
               )}
-              {isExpanded && renderTreeItem(folder.id, depth + 1)}
             </div>
           );
         })}
@@ -230,31 +243,36 @@ function Sidebar({
         {folderNotes.map((note) => (
           <div
             key={note.id}
-            style={{ marginLeft: `${depth * 20}px` }}
-            onContextMenu={(event) => handleContextMenu(event, "note", note.id, note.title || "Untitled Note")}
+            className="tree-item"
+            style={{ marginLeft: `${depth * 16}px` }}
           >
-            {editingItem?.type === "note" && editingItem.id === note.id ? (
-              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <img src="/icons/sidebar/file.svg" alt="" width={16} height={16} aria-hidden="true" />
-                <input
-                  ref={editInputRef}
-                  value={editValue}
-                  onChange={(event) => setEditValue(event.target.value)}
-                  onKeyDown={handleEditKeyDown}
-                  onBlur={handleEditSubmit}
-                  style={{ flex: 1 }}
-                  aria-label="Rename note"
-                />
-              </div>
-            ) : (
-              <button
-                onClick={() => onNoteSelect(note)}
-                style={{ display: "flex", alignItems: "center", gap: "6px" }}
-              >
-                <img src="/icons/sidebar/file.svg" alt="" width={16} height={16} aria-hidden="true" />
-                <span>{note.title || "Untitled Note"}</span>
-              </button>
-            )}
+            <div
+              className={`tree-item__content ${currentNote?.id === note.id ? 'tree-item__content--selected' : ''}`}
+              onContextMenu={(event) => handleContextMenu(event, "note", note.id, note.title || "Untitled Note")}
+            >
+              {editingItem?.type === "note" && editingItem.id === note.id ? (
+                <>
+                  <img src="/icons/sidebar/file.svg" alt="" className="tree-item__icon" aria-hidden="true" />
+                  <input
+                    ref={editInputRef}
+                    value={editValue}
+                    onChange={(event) => setEditValue(event.target.value)}
+                    onKeyDown={handleEditKeyDown}
+                    onBlur={handleEditSubmit}
+                    className="tree-item__input"
+                    aria-label="Rename note"
+                  />
+                </>
+              ) : (
+                <button
+                  onClick={() => onNoteSelect(note)}
+                  className="tree-item__button"
+                >
+                  <img src="/icons/sidebar/file.svg" alt="" className="tree-item__icon" aria-hidden="true" />
+                  <span className="tree-item__text">{note.title || "Untitled Note"}</span>
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </>
@@ -262,127 +280,78 @@ function Sidebar({
   };
 
   return (
-    <div style={{ width: '300px', borderRight: '1px solid #ccc', padding: '10px' }}>
-      <h2>Notes</h2>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "12px",
-          gap: "8px",
-        }}
-      >
-        <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "#334155" }}>Mode</span>
-        <div style={{ display: "flex", gap: "6px" }}>
-          <button
-            type="button"
-            onClick={() => onViewModeChange("edit")}
-            aria-pressed={viewMode === "edit"}
-            style={{
-              padding: "6px 12px",
-              borderRadius: "6px",
-              border: viewMode === "edit" ? "1px solid #6366f1" : "1px solid #cbd5f5",
-              backgroundColor: viewMode === "edit" ? "#eef2ff" : "#ffffff",
-              color: "#1e293b",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            Edit
-          </button>
-          <button
-            type="button"
-            onClick={() => onViewModeChange("view")}
-            aria-pressed={viewMode === "view"}
-            style={{
-              padding: "6px 12px",
-              borderRadius: "6px",
-              border: viewMode === "view" ? "1px solid #6366f1" : "1px solid #cbd5f5",
-              backgroundColor: viewMode === "view" ? "#eef2ff" : "#ffffff",
-              color: "#1e293b",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          >
-            View
-          </button>
+    <div className="sidebar">
+      <div className="sidebar__header">
+        <h2 className="sidebar__title">LIT NOTES</h2>
+        <div className="sidebar__mode-toggle">
+          <span className="sidebar__mode-label">Mode</span>
+          <div className="sidebar__mode-buttons">
+            <button
+              type="button"
+              onClick={() => onViewModeChange("edit")}
+              aria-pressed={viewMode === "edit"}
+              className="sidebar__mode-button"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              onClick={() => onViewModeChange("view")}
+              aria-pressed={viewMode === "view"}
+              className="sidebar__mode-button"
+            >
+              View
+            </button>
+          </div>
         </div>
       </div>
-      <div style={{ marginBottom: '10px', display: 'flex', gap: '5px' }}>
-        <button onClick={onNewNote} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <img src="/icons/sidebar/file-plus.svg" alt="New note icon" width={16} height={16} />
+
+      <div className="sidebar__actions">
+        <button onClick={onNewNote} className="sidebar__action-button">
+          <img src="/icons/sidebar/file-plus.svg" alt="" width={18} height={18} />
           <span>New Note</span>
         </button>
         <button
           onClick={() => onNewFolder(null)}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+          className="sidebar__action-button"
         >
-          <img src="/icons/sidebar/folder-simple-plus.svg" alt="New folder icon" width={16} height={16} />
+          <img src="/icons/sidebar/folder-simple-plus.svg" alt="" width={18} height={18} />
           <span>New Folder</span>
         </button>
       </div>
       
-      <div>
+      <div className="sidebar__content">
         {notes.length === 0 && folders.length === 0 ? (
-          <p>No notes yet. Create your first note!</p>
+          <div className="sidebar__empty">
+            <p className="sidebar__empty-text">No notes yet. Create your first note to get started!</p>
+          </div>
         ) : (
-          <div>{renderTreeItem(null)}</div>
+          renderTreeItem(null)
         )}
       </div>
 
       {contextMenu && (
         <div
+          className="context-menu"
           style={{
-            position: "fixed",
             top: contextMenu.y,
             left: contextMenu.x,
-            background: "#ffffff",
-            border: "1px solid #ccc",
-            borderRadius: "6px",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-            padding: "4px 0",
-            minWidth: "180px",
-            zIndex: 1000,
           }}
           onClick={(event) => event.stopPropagation()}
           onContextMenu={(event) => event.preventDefault()}
         >
           <button
             onClick={() => startEditing(contextMenu.type, contextMenu.id, contextMenu.label)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              width: "100%",
-              padding: "6px 12px",
-              background: "transparent",
-              border: "none",
-              textAlign: "left",
-              cursor: "pointer",
-            }}
+            className="context-menu__item"
           >
-            <img src="/icons/right-click-menu/pencil.svg" alt="" width={16} height={16} aria-hidden="true" />
+            <img src="/icons/right-click-menu/pencil.svg" alt="" className="context-menu__icon" aria-hidden="true" />
             <span>Rename</span>
           </button>
           <button
             onClick={handleDelete}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              width: "100%",
-              padding: "6px 12px",
-              background: "transparent",
-              border: "none",
-              textAlign: "left",
-              cursor: "pointer",
-              color: "#c83d2b",
-            }}
+            className="context-menu__item context-menu__item--delete"
           >
-            <img src="/icons/right-click-menu/trash.svg" alt="" width={16} height={16} aria-hidden="true" />
+            <img src="/icons/right-click-menu/trash.svg" alt="" className="context-menu__icon" aria-hidden="true" />
             <span>Delete</span>
           </button>
         </div>

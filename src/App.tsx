@@ -325,6 +325,7 @@ function App() {
           notes={notes}
           folders={folders}
           currentFolderId={currentFolderId}
+          currentNote={currentNote}
           onNoteSelect={loadNote}
           onNewNote={createNewNote}
           onNewFolder={createNewFolder}

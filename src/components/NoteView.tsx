@@ -236,7 +236,10 @@ function NoteView({
       <div className="note-view note-view--empty">
         <div>
           <h2>No note selected</h2>
-          <p>Select a note from the sidebar or create a new one.</p>
+          <p>Select a note from the sidebar or create a new one to get started.</p>
+          <p style={{ marginTop: '24px', fontSize: '0.875rem', opacity: 0.5 }}>
+            Tip: Use the toolbar buttons to format your notes with Markdown
+          </p>
         </div>
       </div>
     );
