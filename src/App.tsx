@@ -10,19 +10,21 @@ import {
 } from "@tauri-apps/plugin-fs";
 import Sidebar from "./components/Sidebar";
 import NoteView from "./components/NoteView";
-import type { Note } from "./types";
+import type { Note, Folder } from "./types";
 
 
 function App() {
   const [notes, setNotes] = useState<Note[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
   const [currentNote, setCurrentNote] = useState<Note | null>(null);
   const [noteContent, setNoteContent] = useState("");
   const [noteTitle, setNoteTitle] = useState("");
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
 
   // Initialize notes directory and load notes
   useEffect(() => {
     initNotesDirectory();
-    loadNotes();
+    loadData();
   }, []);
 
   const initNotesDirectory = async () => {
@@ -31,8 +33,43 @@ function App() {
       if (!dirExists) {
         await mkdir("notes", { baseDir: BaseDirectory.AppData, recursive: true });
       }
+      const foldersFileExists = await exists("notes/folders.json", { baseDir: BaseDirectory.AppData });
+      if (!foldersFileExists) {
+        await writeTextFile("notes/folders.json", JSON.stringify([]), { baseDir: BaseDirectory.AppData });
+      }
     } catch (error) {
       console.error("Error initializing notes directory:", error);
+    }
+  };
+
+  const loadData = async () => {
+    await loadNotes();
+    await loadFolders();
+  };
+
+  const loadFolders = async () => {
+    try {
+      const content = await readTextFile("notes/folders.json", {
+        baseDir: BaseDirectory.AppData,
+      });
+      const loadedFolders = JSON.parse(content) as Folder[];
+      setFolders(loadedFolders);
+    } catch (error) {
+      console.error("Error loading folders:", error);
+      setFolders([]);
+    }
+  };
+
+  const saveFolders = async (foldersToSave: Folder[]) => {
+    try {
+      await writeTextFile(
+        "notes/folders.json",
+        JSON.stringify(foldersToSave, null, 2),
+        { baseDir: BaseDirectory.AppData }
+      );
+      setFolders(foldersToSave);
+    } catch (error) {
+      console.error("Error saving folders:", error);
     }
   };
 
@@ -47,7 +84,7 @@ function App() {
       const loadedNotes: Note[] = [];
 
       for (const entry of entries) {
-        if (entry.name && entry.name.endsWith(".json")) {
+        if (entry.name && entry.name.endsWith(".json") && entry.name !== "folders.json") {
           try {
             const content = await readTextFile(`notes/${entry.name}`, {
               baseDir: BaseDirectory.AppData,
@@ -74,10 +111,44 @@ function App() {
       title: "",
       content: "",
       createdAt: Date.now(),
+      folderId: currentFolderId,
     };
     setCurrentNote(newNote);
     setNoteTitle("");
     setNoteContent("");
+  };
+
+  const generateFolderName = (parentId: string | null) => {
+    const baseName = "New Folder";
+    const siblingNames = new Set(
+      folders
+        .filter((folder) => folder.parentId === parentId)
+        .map((folder) => folder.name.trim())
+    );
+
+    if (!siblingNames.has(baseName)) {
+      return baseName;
+    }
+
+    let counter = 2;
+    while (siblingNames.has(`${baseName} ${counter}`)) {
+      counter += 1;
+    }
+    return `${baseName} ${counter}`;
+  };
+
+  const createNewFolder = async (parentId: string | null) => {
+    const folderName = generateFolderName(parentId);
+
+    const newFolder: Folder = {
+      id: Date.now().toString(),
+      name: folderName,
+      parentId: parentId,
+      createdAt: Date.now(),
+    };
+
+    const updatedFolders = [...folders, newFolder];
+    await saveFolders(updatedFolders);
   };
 
   const saveNote = async () => {
@@ -88,6 +159,7 @@ function App() {
         ...currentNote,
         title: noteTitle || "Untitled Note",
         content: noteContent,
+        folderId: currentNote.folderId,
       };
 
       await writeTextFile(
@@ -119,8 +191,12 @@ function App() {
       <div style={{ display: 'flex', gap: '20px' }}>
         <Sidebar 
           notes={notes}
+          folders={folders}
+          currentFolderId={currentFolderId}
           onNoteSelect={loadNote}
           onNewNote={createNewNote}
+          onNewFolder={createNewFolder}
+          onFolderSelect={setCurrentFolderId}
         />
         
         <NoteView
@@ -137,4 +213,3 @@ function App() {
 }
 
 export default App;
-
