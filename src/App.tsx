@@ -8,13 +8,10 @@ import {
   mkdir,
   readDir
 } from "@tauri-apps/plugin-fs";
+import Sidebar from "./components/Sidebar";
+import NoteView from "./components/NoteView";
+import type { Note } from "./types";
 
-interface Note {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: number;
-}
 
 function App() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -119,52 +116,21 @@ function App() {
 
   return (
     <main>
-      <h1>Lit</h1>
-      <p>The world's best notetaking app!</p>
-
-      <div>
-        <button onClick={createNewNote}>New Note</button>
-        {currentNote && <button onClick={saveNote}>Save</button>}
-      </div>
-
-      {currentNote && (
-        <div>
-          <h2>Editing Note</h2>
-          <div>
-            <input
-              type="text"
-              placeholder="Note title"
-              value={noteTitle}
-              onChange={(e) => setNoteTitle(e.target.value)}
-            />
-          </div>
-          <div>
-            <textarea
-              placeholder="Note content"
-              value={noteContent}
-              onChange={(e) => setNoteContent(e.target.value)}
-              rows={10}
-              cols={50}
-            />
-          </div>
-        </div>
-      )}
-
-      <div>
-        <h2>Saved Notes</h2>
-        {notes.length === 0 ? (
-          <p>No notes yet. Create your first note!</p>
-        ) : (
-          <ul>
-            {notes.map((note) => (
-              <li key={note.id}>
-                <button onClick={() => loadNote(note)}>
-                  {note.title || "Untitled Note"} - {new Date(note.createdAt).toLocaleString()}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+      <div style={{ display: 'flex', gap: '20px' }}>
+        <Sidebar 
+          notes={notes}
+          onNoteSelect={loadNote}
+          onNewNote={createNewNote}
+        />
+        
+        <NoteView
+          note={currentNote}
+          title={noteTitle}
+          content={noteContent}
+          onTitleChange={setNoteTitle}
+          onContentChange={setNoteContent}
+          onSave={saveNote}
+        />
       </div>
     </main>
   );
