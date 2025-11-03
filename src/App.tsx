@@ -6,7 +6,8 @@ import {
   BaseDirectory, 
   exists, 
   mkdir,
-  readDir
+  readDir,
+  remove
 } from "@tauri-apps/plugin-fs";
 import Sidebar from "./components/Sidebar";
 import NoteView from "./components/NoteView";
@@ -186,6 +187,136 @@ function App() {
     setNoteContent(note.content);
   };
 
+  const renameNote = async (noteId: string, newTitle: string) => {
+    const trimmedTitle = newTitle.trim();
+    if (!trimmedTitle) {
+      return;
+    }
+
+    const noteIndex = notes.findIndex((note) => note.id === noteId);
+    if (noteIndex === -1) {
+      return;
+    }
+
+    const noteToUpdate: Note = {
+      ...notes[noteIndex],
+      title: trimmedTitle,
+    };
+
+    try {
+      await writeTextFile(
+        `notes/${noteId}.json`,
+        JSON.stringify(noteToUpdate, null, 2),
+        { baseDir: BaseDirectory.AppData }
+      );
+
+      const updatedNotes = [...notes];
+      updatedNotes[noteIndex] = noteToUpdate;
+      setNotes(updatedNotes);
+
+      if (currentNote?.id === noteId) {
+        setCurrentNote(noteToUpdate);
+        setNoteTitle(trimmedTitle);
+      }
+    } catch (error) {
+      console.error("Error renaming note:", error);
+    }
+  };
+
+  const deleteNote = async (noteId: string) => {
+    try {
+      await remove(`notes/${noteId}.json`, {
+        baseDir: BaseDirectory.AppData,
+      });
+    } catch (error) {
+      console.error("Error deleting note file:", error);
+    }
+
+    const remainingNotes = notes.filter((note) => note.id !== noteId);
+    setNotes(remainingNotes);
+
+    if (currentNote?.id === noteId) {
+      setCurrentNote(null);
+      setNoteTitle("");
+      setNoteContent("");
+    }
+  };
+
+  const renameFolder = async (folderId: string, newName: string) => {
+    const trimmedName = newName.trim();
+    if (!trimmedName) {
+      return;
+    }
+
+    const folderIndex = folders.findIndex((folder) => folder.id === folderId);
+    if (folderIndex === -1) {
+      return;
+    }
+
+    const updatedFolders = [...folders];
+    updatedFolders[folderIndex] = {
+      ...updatedFolders[folderIndex],
+      name: trimmedName,
+    };
+
+    await saveFolders(updatedFolders);
+  };
+
+  const getDescendantFolderIds = (folderId: string, allFolders: Folder[]) => {
+    const stack = [folderId];
+    const descendants = new Set<string>([folderId]);
+
+    while (stack.length > 0) {
+      const current = stack.pop()!;
+      for (const folder of allFolders) {
+        if (folder.parentId === current && !descendants.has(folder.id)) {
+          descendants.add(folder.id);
+          stack.push(folder.id);
+        }
+      }
+    }
+
+    return descendants;
+  };
+
+  const deleteFolder = async (folderId: string) => {
+    const foldersToDelete = getDescendantFolderIds(folderId, folders);
+
+    const notesToDelete = notes.filter(
+      (note) => note.folderId && foldersToDelete.has(note.folderId)
+    );
+
+    for (const note of notesToDelete) {
+      try {
+        await remove(`notes/${note.id}.json`, {
+          baseDir: BaseDirectory.AppData,
+        });
+      } catch (error) {
+        console.error(`Error deleting note file ${note.id}:`, error);
+      }
+    }
+
+    const remainingNotes = notes.filter(
+      (note) => !notesToDelete.some((deletedNote) => deletedNote.id === note.id)
+    );
+    setNotes(remainingNotes);
+
+    if (currentNote && notesToDelete.some((note) => note.id === currentNote.id)) {
+      setCurrentNote(null);
+      setNoteTitle("");
+      setNoteContent("");
+    }
+
+    if (currentFolderId && foldersToDelete.has(currentFolderId)) {
+      setCurrentFolderId(null);
+    }
+
+    const remainingFolders = folders.filter(
+      (folder) => !foldersToDelete.has(folder.id)
+    );
+    await saveFolders(remainingFolders);
+  };
+
   return (
     <main>
       <div style={{ display: 'flex', gap: '20px' }}>
@@ -197,6 +328,10 @@ function App() {
           onNewNote={createNewNote}
           onNewFolder={createNewFolder}
           onFolderSelect={setCurrentFolderId}
+          onRenameNote={renameNote}
+          onDeleteNote={deleteNote}
+          onRenameFolder={renameFolder}
+          onDeleteFolder={deleteFolder}
         />
         
         <NoteView
