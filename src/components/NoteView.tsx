@@ -20,7 +20,7 @@ type TransformationResult = {
   selectionEnd: number;
 };
 
-type PreviewMode = "rendered" | "raw";
+type ViewMode = "rendered" | "raw";
 
 interface NoteViewProps {
   note: Note | null;
@@ -40,7 +40,7 @@ function NoteView({
   onSave,
 }: NoteViewProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const [previewMode, setPreviewMode] = useState<PreviewMode>("rendered");
+  const [viewMode, setViewMode] = useState<ViewMode>("raw");
 
   const previewHtml = useMemo(() => {
     if (!content.trim()) {
@@ -316,57 +316,52 @@ function NoteView({
               Img
             </button>
           </div>
+
+          <div className="note-editor__toolbar-group note-editor__view-toggle">
+            <button
+              type="button"
+              className={viewMode === "raw" ? "active" : ""}
+              onClick={() => setViewMode("raw")}
+              aria-label="Show raw markdown editor"
+            >
+              Raw
+            </button>
+            <button
+              type="button"
+              className={viewMode === "rendered" ? "active" : ""}
+              onClick={() => setViewMode("rendered")}
+              aria-label="Show rendered markdown preview"
+            >
+              Rendered
+            </button>
+          </div>
         </div>
 
         <div className="note-editor__panels">
-          <div className="note-editor__input">
-            <textarea
-              ref={textareaRef}
-              className="note-editor__textarea"
-              placeholder="Start typing in Markdown..."
-              value={content}
-              onChange={(event) => onContentChange(event.target.value)}
-            />
-          </div>
-
-          <div className="note-editor__preview">
-            <div className="note-editor__preview-header">
-              <span className="note-editor__preview-title">
-                {previewMode === "rendered" ? "Preview" : "Raw Markdown"}
-              </span>
-              <div className="note-editor__preview-mode">
-                <button
-                  type="button"
-                  className={previewMode === "rendered" ? "active" : ""}
-                  onClick={() => setPreviewMode("rendered")}
-                >
-                  Rendered
-                </button>
-                <button
-                  type="button"
-                  className={previewMode === "raw" ? "active" : ""}
-                  onClick={() => setPreviewMode("raw")}
-                >
-                  Raw
-                </button>
-              </div>
+          {viewMode === "raw" ? (
+            <div className="note-editor__input">
+              <textarea
+                ref={textareaRef}
+                className="note-editor__textarea"
+                placeholder="Start typing in Markdown..."
+                value={content}
+                onChange={(event) => onContentChange(event.target.value)}
+              />
             </div>
-
-            <div className="note-editor__preview-body">
-              {previewMode === "rendered" ? (
-                previewHtml ? (
+          ) : (
+            <div className="note-editor__preview">
+              <div className="note-editor__preview-body">
+                {previewHtml ? (
                   <div
                     className="note-editor__preview-content"
                     dangerouslySetInnerHTML={{ __html: previewHtml }}
                   />
                 ) : (
                   <p className="note-editor__empty-preview">Nothing to preview yet.</p>
-                )
-              ) : (
-                <pre className="note-editor__raw-preview">{content || "Nothing to show yet."}</pre>
-              )}
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

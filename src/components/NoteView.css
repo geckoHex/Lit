@@ -85,6 +85,31 @@
   border-left: 1px solid #d4d4d8;
 }
 
+.note-editor__view-toggle {
+  margin-left: auto;
+}
+
+.note-editor__view-toggle button {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 6px 10px;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.note-editor__view-toggle button.active {
+  border-color: #6366f1;
+  background-color: #eef2ff;
+  color: #1e293b;
+}
+
+.note-editor__view-toggle button:not(.active):hover {
+  background-color: #e2e8f0;
+}
+
 .note-editor__toolbar button {
   padding: 8px 10px;
   border-radius: 6px;
@@ -136,44 +161,6 @@
   outline: none;
   border-color: #6366f1;
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-}
-
-.note-editor__preview-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.note-editor__preview-title {
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.note-editor__preview-mode {
-  display: flex;
-  gap: 4px;
-}
-
-.note-editor__preview-mode button {
-  border: 1px solid transparent;
-  border-radius: 6px;
-  padding: 6px 10px;
-  background-color: transparent;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-
-.note-editor__preview-mode button.active {
-  border-color: #6366f1;
-  background-color: #eef2ff;
-  color: #1e293b;
-}
-
-.note-editor__preview-mode button:not(.active):hover {
-  background-color: #e2e8f0;
 }
 
 .note-editor__preview-body {
@@ -234,16 +221,6 @@
   padding: 2px 6px;
   border-radius: 6px;
   background-color: #e2e8f0;
-}
-
-.note-editor__raw-preview {
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro", "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: #0f172a;
 }
 
 .note-editor__empty-preview {
